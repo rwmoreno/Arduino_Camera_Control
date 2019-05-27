@@ -11,28 +11,64 @@ void action_SO_Trigger()
       programStateNew = program_state_Run_Trigger_Wait;
       functionPrintTriggerWait();
       break;
+      
     case nunchukActionC:
       /* C pressed so go back to selection menu */
+      programStateLast = programStateNew;
       programStateNew = program_state_SM_Trigger;
       functionPrintSMTrigger();
       break;
+      
+    case nunchukActionLeft:
+      if (optionCursorDelay) {
+        optionCursorDelay = 0;
+        functionPrintSOTrigger();
+      }
+      break;
+    
+    case nunchukActionRight:
+      if (!optionCursorDelay) {
+        optionCursorDelay = 1;
+        functionPrintSOTrigger();
+      }
+      break;
+    
     case nunchukActionUp:
       /* 'Up' pushed */
       programStateLast = programStateNew;
-      if (!optionTriggerLevel) {
-        optionTriggerLevel = 1;
+      if (!optionCursorDelay) {
+        if (!optionTriggerLevel) {
+          optionTriggerLevel = 1;
+          functionPrintSOTrigger();
+        }/* If optionTrigger changed to high */
+      } /*If not on delay */
+      else {
+        optionTriggerDelay = optionTriggerDelay + 1;
+        if (optionTriggerDelay > 999) {
+           optionTriggerDelay = 999;
+        } /* If optionTriggerDelay > 999 */
         functionPrintSOTrigger();
-      }/* If optionTrigger changed to high */
-      break;
+      } /* Else */
+      break; /* Case nunchuckActionUp */
+      
     case nunchukActionDown:
       /* 'Down' pushed */
       programStateLast = programStateNew;
-      if (optionTriggerLevel) {
-        optionTriggerLevel = 0;
+      if (!optionCursorDelay)  {
+        if (optionTriggerLevel) {
+          optionTriggerLevel = 0;
+          functionPrintSOTrigger();
+        } /* If optionTrigger changed to low */
+      }
+      else {
+        optionTriggerDelay = optionTriggerDelay - 1;
+        if (optionTriggerDelay < 0) {
+           optionTriggerDelay = 0;
+        } /* If optionTriggerDelay <0 */
         functionPrintSOTrigger();
-      } /* If optionTrigger changed to low */
+      } /* Else */
       break;
-  }
+  } /* Switch */
 } /* Function action_SO_Trigger */
 
 void action_Run_Trigger_Wait()
@@ -40,15 +76,8 @@ void action_Run_Trigger_Wait()
   boolean triggerLevel;
   int     currentTime;
   
-  Serial.println("In action_Run_Trigger_Wait");
+
   triggerLevel = digitalRead(pinTrigger);
-  Serial.print("optionTriggerLevel = ");
-  Serial.println(optionTriggerLevel);
-  Serial.println("triggerLevel = ");
-  Serial.println(triggerLevel);
-  Serial.print("(optionTriggerLevel ^ triggerLevel) = ");
-  Serial.println((optionTriggerLevel ^ triggerLevel));
-  Serial.println("----------------------------------");
   currentTime = millis();
   if (nunchukAction == nunchukActionC) {
   /* C was pushed to go back in the menu */
@@ -66,10 +95,17 @@ void action_Run_Trigger_Wait()
           /* Opposite of trigger long enough, change state to wair for trigger */
           programStateNew = program_state_Run_Trigger_Ready;
           functionPrintTriggerReady();
+          triggerShotTaken = false;
+          if (triggerLevel) {
+            attachInterrupt(1, interruptTriggerShot, FALLING);
+          }
+          else {
+            attachInterrupt(1, interruptTriggerShot, RISING);
+          }
         } /* Trigger disabled long enough */
       }
       else {
-        /* Trigger opposit of trigger, but low not recorded yet*/
+        /* Trigger opposite of trigger, but low not recorded yet*/
         triggerLowRecorded = 1;
         triggerLowTime = currentTime;
       } /* Trigger recorded */
@@ -81,28 +117,46 @@ void action_Run_Trigger_Wait()
   } /* C not pressed */
 }
 
+/* Trigger function                             */
+/* Due to time sensitivity of the trigger,      */
+/* the trigger is handled by an interupt        */
+
 void action_Run_Trigger_Ready()
 {
-  boolean triggerLevel;
-  
-  triggerLevel = digitalRead(pinTrigger);
-  if (nunchukAction == nunchukActionC) {
-  /* C was pushed to go back in the menu */
+
+/* Need to add check for photo or C press */
+
+  if (triggerShotTaken) {
+    /* Interrupt caused photo to be taken so delay, end photo, then return to wait */
+    delay(shotTriggerHold);
+    detachInterrupt(1);  
+    functionPhotoEnd();
     programStateLast = programStateNew;
-    programStateNew = program_state_SO_Trigger;
-    functionPrintSOTrigger();
-  }
+    programStateNew = program_state_Run_Trigger_Wait;
+    functionPrintTriggerWait();
+  } /* Trigger shot taken */
   else {
-    if ( optionTriggerLevel == triggerLevel) {
-      /* Photo was triggered */
-      functionPhotoShot();
+    if (nunchukAction == nunchukActionC) {
+      /* C was pushed to go back in the menu */
       programStateLast = programStateNew;
-      programStateNew = program_state_Run_Trigger_Wait;
-      triggerLowRecorded = 0;
-      functionPrintTriggerWait();
-    } /* If trigger was activated */
-  } /* If C pushed */
-}
+      programStateNew = program_state_SO_Trigger;
+      functionPrintSOTrigger();
+    } /* If C button pushed */
+  } /* Else - C not pushed */
+} /* action_Run_Trigger_Ready */
+
+
+void interruptTriggerShot()
+{
+  if (!triggerShotTaken) {
+    delay(optionTriggerDelay);
+    digitalWrite(pinCameraFocus, HIGH);
+    digitalWrite(pinCameraShot, HIGH);
+    triggerShotTaken = true;
+  } /* If trigger shot has not been taken yet */
+} /* interuptTriggerShot */
+
+
 
 void action_Run_Manual()
 {

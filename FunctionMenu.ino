@@ -55,6 +55,7 @@ void action_SM_All()
         functionPrintSMTimeLapseB();
         break;
       case program_state_SM_Trigger:
+        optionCursorDelay = 0;
         functionPrintSMTrigger();
         break;
       case program_state_SM_Manual:
@@ -99,6 +100,4 @@ void action_SO_Manual()
     programStateNew = program_state_SM_Manual;
   } /* If C pressed */    
 }
-
-
 
