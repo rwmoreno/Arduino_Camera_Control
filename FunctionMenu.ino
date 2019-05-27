@@ -108,8 +108,6 @@ void action_SO_Manual()
     programStateNew = program_state_SM_Manual;
   } /* If C pressed */    
 }
-
-
 /* ======================================== */
 /* Function for setting Backlight off time  */
 /* ======================================== */
@@ -151,4 +149,5 @@ void action_SO_Option()
     break;
   } /* Case */
 } /* action_SO_Option() */
+
 
