@@ -51,8 +51,22 @@ void functionPrintSMManual()
 }
 
 /* ---------------------------------------------*/
+/* Print to LCD for Set Mode (Options)           */
+/* -------------------------------------------- */
+
+void functionPrintSMOption()
+{
+  lcd.clear();
+  lcd.noCursor();
+  lcd.print("Set Mode");
+  lcd.setCursor(0,1);
+  lcd.print(" Options");
+}
+
+/* ---------------------------------------------*/
 /* Print to LCD for Set Option for Time Lapse   */
 /* -------------------------------------------- */
+
 
 void functionPrintSOTimeLapse()
 {
@@ -96,11 +110,48 @@ void functionPrintSOTrigger()
   lcd.clear();
   lcd.print("Trigger");
   lcd.setCursor(0,1);
-  lcd.print("Trigger on: ");
+  lcd.print("Tr: ");
   functionPrintTriggerOption(optionTriggerLevel);
-  lcd.setCursor(12,1);
+  lcd.print(" D: ");
+  functionPrintTriggerDelay(optionTriggerDelay);
+  if (optionCursorDelay == 1) {
+    lcd.setCursor(14,1);
+  }
+  else {
+    lcd.setCursor(4,1);
+  }
   lcd.cursor();
 }
+
+/* ---------------------------------------------*/
+/* Print selected trigger level (High/Low)      */
+/* -------------------------------------------- */
+
+void functionPrintTriggerOption(boolean TriggerLevel)
+{
+  if (TriggerLevel) {
+    lcd.print("High");
+  }
+  else {
+    lcd.print("Low ");
+  }
+}
+
+/* ---------------------------------------------*/
+/* Print delay time for trigger                 */
+/* -------------------------------------------- */
+
+void   functionPrintTriggerDelay(int delayTime)
+{
+  if (delayTime < 100) {
+    lcd.print("0");
+    if (delayTime < 10) {
+      lcd.print("0");
+    }
+  }
+  lcd.print(delayTime);
+}
+
 
 /* ---------------------------------------------*/
 /* Print to LCD for Set Option for Manual       */
@@ -116,6 +167,19 @@ void functionPrintSOManual()
 }
 
 /* ---------------------------------------------*/
+/* Print to LCD for Set Option for Options      */
+/* -------------------------------------------- */
+
+void functionPrintSOOption()
+{
+  lcd.clear();
+  lcd.noCursor();
+  lcd.print("Options");
+  lcd.setCursor(0,1);
+  lcd.print("BL time off: ");
+}
+
+/* ---------------------------------------------*/
 /* Print to LCD for Set Option for Manual       */
 /* -------------------------------------------- */
 
@@ -126,6 +190,16 @@ void functionPrintTimeLapseRun()
   lcd.print("Shooting ...");
   lcd.setCursor(0,1);
   lcd.print("Press c to stop");
+}
+
+/* ---------------------------------------------*/
+/* Print to LCD for Set Option for Manual       */
+/* -------------------------------------------- */
+
+void functionPrintTimeLapseTime()
+{
+  lcd.setCursor(12,0);
+  functionPrintSeconds((int) countdownTime);
 }
 
 /* ---------------------------------------------*/
@@ -171,20 +245,6 @@ void functionPrintSeconds(int time)
     lcd.print(" ");
   }
   lcd.print(time);
-}
-
-/* ---------------------------------------------*/
-/* Print selected trigger level (High/Low)      */
-/* -------------------------------------------- */
-
-void functionPrintTriggerOption(boolean TriggerLevel)
-{
-  if (TriggerLevel) {
-    lcd.print("High");
-  }
-  else {
-    lcd.print("Low");
-  }
 }
 
 /* ---------------------------------------------*/

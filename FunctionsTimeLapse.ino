@@ -2,21 +2,29 @@ void action_SO_TimeLapse(boolean bulbMode)
 {
   switch (nunchukAction) {
     case nunchukActionZ:
-      /* Z was pushed */
+      /* Z Pushed ------------------------------------------------------*/
       programStateLast = programStateNew;
       functionPrintTimeLapseRun();
       triggerTime = millis();
+      triggerTimeAdj = triggerTime;
       if (!bulbMode) {
-        functionPhotoShot();  /* Take a picture */
+        /* Take a picture, change display, and change mode */
+        functionPhotoShot();
+        countdownTime = optionDelayTime;
+        functionPrintTimeLapseTime();
+        countdownTimeDisplayed = countdownTime;
         programStateNew = program_state_Run_TimeLapse;
       }
       else {
         functionPhotoBegin();
+        countdownTime = optionDelayTimeB;
+        functionPrintTimeLapseTime();
+        countdownTimeDisplayed = countdownTime;
         programStateNew = program_state_Run_TimeLapseB;
       }
     break;
     case nunchukActionC:
-      /* C was pushed to go back in the menu */
+      /* C Pushed ------------------------------------------------------*/
       programStateLast = programStateNew;
       if (!bulbMode) {
         programStateNew = program_state_SM_TimeLapse;
@@ -28,23 +36,25 @@ void action_SO_TimeLapse(boolean bulbMode)
       }
     break;
     case nunchukActionUp:
-      /* 'Up' pushed */
-//      Serial.println("Up");
+      /* Up Pushed ------------------------------------------------------*/
       programStateLast = programStateNew;
       if (bulbMode && !optionCursorDelay) {
+        /* Up Pushed, in bulb mode, cursor on bulb time-------------------*/
         optionBulbTime = optionBulbTime + 1;
-        if (optionBulbTime > 1800) {
-          optionBulbTime = 1800;
-        } /* If bulbTime > 1800 */
+        if (optionBulbTime > optionDelayTimeB - 1) {
+          optionBulbTime = optionDelayTimeB - 1;
+        } /* If bulbTime > optionDelayTimeB - 1 */
       } /* bulbMode && !optionBulbTime */
       else {
         if (bulbMode) {
+        /* Up Pushed, in bulb mode, cursor on delay time-------------------*/
           optionDelayTimeB = optionDelayTimeB + 1;
           if (optionDelayTimeB > 1800) {
             optionDelayTimeB = 1800;
           } /* If optionDelayTime > 1800 */
         }
         else {
+        /* Up Pushed, not in bulb mode, cursor on delay time---------------*/
           optionDelayTime = optionDelayTime + 1;
           if (optionDelayTime > 1800) {
             optionDelayTime = 1800;
@@ -59,23 +69,25 @@ void action_SO_TimeLapse(boolean bulbMode)
       } /* Else */
     break;
     case nunchukActionDown:
-      /* 'Down' pushed */
-//      Serial.println("Down");
+      /* Down Pushed ------------------------------------------------------*/
       programStateLast = programStateNew;
       if (bulbMode && !optionCursorDelay) {
+        /* Down Pushed, in bulb mode, cursor on bulb time-------------------*/
         optionBulbTime = optionBulbTime - 1;
         if (optionBulbTime < 1) {
           optionBulbTime = 1;
         } /* If bulbTime <1 */
       } /* bulbMode && !optionBulbTime */
       else {
+        /* Down Pushed, in bulb mode, cursor on delay time------------------*/
         if (bulbMode) {
           optionDelayTimeB = optionDelayTimeB - 1;
-          if (optionDelayTimeB < 5) {
-            optionDelayTimeB = 5;
+          if (optionDelayTimeB < (optionBulbTime + 1)) {
+            optionDelayTimeB = optionBulbTime + 1;
           } /* If optionDelayTime < 5 */
         }
         else {
+        /* Down Pushed, not in bulb mode, cursor on delay time---------------*/
           optionDelayTime = optionDelayTime - 1;
           if (optionDelayTime < 5) {
             optionDelayTime = 5;
@@ -112,10 +124,10 @@ void action_SO_TimeLapse(boolean bulbMode)
 } /* action_SO_Timelapse */
 
 
-/* Run Time Lapse until Z is pusshed */
+/* Run Time Lapse until Z is pushed */
 void action_Run_TimeLapse()
 {
-  int currentTime;
+  unsigned long currentTime;
 
   switch (nunchukAction) {
     case nunchukActionC:
@@ -126,9 +138,14 @@ void action_Run_TimeLapse()
       break;
     default:
       currentTime = millis();
-      if ( (currentTime - triggerTime) >= optionDelayTime * 1000) {
+      countdownTime =  (int) ((((unsigned long) optionDelayTime * 1000) - (currentTime - triggerTimeAdj))/1000)+1;
+      if (countdownTime != countdownTimeDisplayed) {
+        functionPrintTimeLapseTime();
+        countdownTimeDisplayed = countdownTime;
+      } /* If countdown time is not same as displayed */
+      if ( (currentTime - triggerTimeAdj) >= ((long) optionDelayTime * 1000) ) {
         functionPhotoShot();  /* Take a picture */
-        triggerTime = currentTime;
+        triggerTimeAdj = triggerTimeAdj + (long) optionDelayTime * 1000;
       }/* If time for photo */
   } /* switch */
 } /* Action_Run_TimeLapse */
@@ -136,7 +153,7 @@ void action_Run_TimeLapse()
 /* Run Time Lapse until C is pushed */
 void action_Run_TimeLapseB()
 {
-  int currentTime;
+  unsigned long currentTime;
 
   switch (nunchukAction) {
     case nunchukActionC:
@@ -144,21 +161,35 @@ void action_Run_TimeLapseB()
       if (inBulbShot) {
           functionPhotoEnd();
       }
-        programStateLast = programStateNew;
+      programStateLast = programStateNew;
       programStateNew = program_state_SO_TimeLapseB;
       functionPrintSOTimeLapseB();
       break;
     default:
       currentTime = millis();
       if (inBulbShot) {
-        if ( (currentTime - triggerTime) >= optionBulbTime * 1000) {
+        /* In bulb shot, see if dispay must change */
+        countdownTime =  (int) ((((unsigned long) optionBulbTime * 1000) - (currentTime - triggerTime))/1000)+1;
+        if (countdownTime != countdownTimeDisplayed) {
+          functionPrintTimeLapseTime();
+          countdownTimeDisplayed = countdownTime;
+        } /* If countdown time is not same as displayed */
+        if ( (currentTime - triggerTime) >= ((long) optionBulbTime * 1000) ) {
           functionPhotoEnd();
-        } /* If bulb time is met */
+        } /* If bulb time is met */ 
       } /* In bulb shot */
       else {
-        if ( (currentTime - triggerTime) >= optionDelayTimeB * 1000) {
+        /* Not in bulb shot */
+        /* See if dispay must change */
+        countdownTime =  (int) ((((unsigned long) optionDelayTimeB * 1000) - (currentTime - triggerTimeAdj))/1000)+1;
+        if (countdownTime != countdownTimeDisplayed) {
+          functionPrintTimeLapseTime();
+          countdownTimeDisplayed = countdownTime;
+        } /* If countdown time is not same as displayed */
+        if ( (currentTime - triggerTimeAdj) >= ((long) optionDelayTimeB * 1000) ) {
           functionPhotoBegin();
           triggerTime = currentTime;
+          triggerTimeAdj = triggerTimeAdj + ((long) optionDelayTimeB * 1000);
         }/* If ready for next shot */
       }/* Else */
   }/* Switch */

@@ -61,11 +61,14 @@ void setup() {
     nunchukZ.action = nunchuk_action_None;
 
     /* Set default options */
-    optionDelayTime      =  30; /* Default delay time in seconds*/
+    optionDelayTime      =  30;  /* Default delay time in seconds*/
     optionDelayTimeB     = 300;  /* Default delay time for bulb option, in seconds */
-    optionBulbTime       =  30; /* Default bulb time in seconds */
-    optionCursorDelay    =   1; /* Default to cursor on delay for Bulb options screen*/
-    optionTriggerLevel   =   0; /* Trigger on low */
+    optionBulbTime       =  30;  /* Default bulb time in seconds */
+    optionTriggerDelay   =   0;  /* Default delay between trigger enabled and photo shot */
+    optionCursorDelay    =   1;  /* Default to cursor on delay for Bulb options screen*/
+    optionTriggerLevel   =   0;  /* Trigger on low */
+    optionBacklightOffTime = 30; /* Time for backlight of LCD to turn off */
+    lcdTurnOffTime = optionBacklightOffTime * 1000; /* Set time for backlight to turn off - in milliseconds */
     
     /* Not in middle of bulb shot */
     inBulbShot = 0;
