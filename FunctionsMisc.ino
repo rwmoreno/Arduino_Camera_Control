@@ -96,11 +96,48 @@ void functionPrintSOTrigger()
   lcd.clear();
   lcd.print("Trigger");
   lcd.setCursor(0,1);
-  lcd.print("Trigger on: ");
+  lcd.print("Tr: ");
   functionPrintTriggerOption(optionTriggerLevel);
-  lcd.setCursor(12,1);
+  lcd.print(" D: ");
+  functionPrintTriggerDelay(optionTriggerDelay);
+  if (optionCursorDelay == 1) {
+    lcd.setCursor(14,1);
+  }
+  else {
+    lcd.setCursor(4,1);
+  }
   lcd.cursor();
 }
+
+/* ---------------------------------------------*/
+/* Print selected trigger level (High/Low)      */
+/* -------------------------------------------- */
+
+void functionPrintTriggerOption(boolean TriggerLevel)
+{
+  if (TriggerLevel) {
+    lcd.print("High");
+  }
+  else {
+    lcd.print("Low ");
+  }
+}
+
+/* ---------------------------------------------*/
+/* Print delay time for trigger                 */
+/* -------------------------------------------- */
+
+void   functionPrintTriggerDelay(int delayTime)
+{
+  if (delayTime < 100) {
+    lcd.print("0");
+    if (delayTime < 10) {
+      lcd.print("0");
+    }
+  }
+  lcd.print(delayTime);
+}
+
 
 /* ---------------------------------------------*/
 /* Print to LCD for Set Option for Manual       */
@@ -171,20 +208,6 @@ void functionPrintSeconds(int time)
     lcd.print(" ");
   }
   lcd.print(time);
-}
-
-/* ---------------------------------------------*/
-/* Print selected trigger level (High/Low)      */
-/* -------------------------------------------- */
-
-void functionPrintTriggerOption(boolean TriggerLevel)
-{
-  if (TriggerLevel) {
-    lcd.print("High");
-  }
-  else {
-    lcd.print("Low");
-  }
 }
 
 /* ---------------------------------------------*/

@@ -64,6 +64,7 @@ void setup() {
     optionDelayTime      =  30; /* Default delay time in seconds*/
     optionDelayTimeB     = 300;  /* Default delay time for bulb option, in seconds */
     optionBulbTime       =  30; /* Default bulb time in seconds */
+    optionTriggerDelay   =   0; /* Default delay between trigger enabled and photo shot */
     optionCursorDelay    =   1; /* Default to cursor on delay for Bulb options screen*/
     optionTriggerLevel   =   0; /* Trigger on low */
     
