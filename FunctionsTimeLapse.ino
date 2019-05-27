@@ -2,7 +2,7 @@ void action_SO_TimeLapse(boolean bulbMode)
 {
   switch (nunchukAction) {
     case nunchukActionZ:
-      /* Z was pushed */
+      /* Z Pushed ------------------------------------------------------*/
       programStateLast = programStateNew;
       functionPrintTimeLapseRun();
       triggerTime = millis();
@@ -16,7 +16,7 @@ void action_SO_TimeLapse(boolean bulbMode)
       }
     break;
     case nunchukActionC:
-      /* C was pushed to go back in the menu */
+      /* C Pushed ------------------------------------------------------*/
       programStateLast = programStateNew;
       if (!bulbMode) {
         programStateNew = program_state_SM_TimeLapse;
@@ -28,23 +28,25 @@ void action_SO_TimeLapse(boolean bulbMode)
       }
     break;
     case nunchukActionUp:
-      /* 'Up' pushed */
-//      Serial.println("Up");
+      /* Up Pushed ------------------------------------------------------*/
       programStateLast = programStateNew;
       if (bulbMode && !optionCursorDelay) {
+        /* Up Pushed, in bulb mode, cursor on bulb time-------------------*/
         optionBulbTime = optionBulbTime + 1;
-        if (optionBulbTime > 1800) {
-          optionBulbTime = 1800;
-        } /* If bulbTime > 1800 */
+        if (optionBulbTime > optionDelayTimeB - 1) {
+          optionBulbTime = optionDelayTimeB - 1;
+        } /* If bulbTime > optionDelayTimeB - 1 */
       } /* bulbMode && !optionBulbTime */
       else {
         if (bulbMode) {
+        /* Up Pushed, in bulb mode, cursor on delay time-------------------*/
           optionDelayTimeB = optionDelayTimeB + 1;
           if (optionDelayTimeB > 1800) {
             optionDelayTimeB = 1800;
           } /* If optionDelayTime > 1800 */
         }
         else {
+        /* Up Pushed, not in bulb mode, cursor on delay time---------------*/
           optionDelayTime = optionDelayTime + 1;
           if (optionDelayTime > 1800) {
             optionDelayTime = 1800;
@@ -59,23 +61,25 @@ void action_SO_TimeLapse(boolean bulbMode)
       } /* Else */
     break;
     case nunchukActionDown:
-      /* 'Down' pushed */
-//      Serial.println("Down");
+      /* Down Pushed ------------------------------------------------------*/
       programStateLast = programStateNew;
       if (bulbMode && !optionCursorDelay) {
+        /* Down Pushed, in bulb mode, cursor on bulb time-------------------*/
         optionBulbTime = optionBulbTime - 1;
         if (optionBulbTime < 1) {
           optionBulbTime = 1;
         } /* If bulbTime <1 */
       } /* bulbMode && !optionBulbTime */
       else {
+        /* Down Pushed, in bulb mode, cursor on delay time------------------*/
         if (bulbMode) {
           optionDelayTimeB = optionDelayTimeB - 1;
-          if (optionDelayTimeB < 5) {
-            optionDelayTimeB = 5;
+          if (optionDelayTimeB < (optionBulbTime + 1)) {
+            optionDelayTimeB = optionBulbTime + 1;
           } /* If optionDelayTime < 5 */
         }
         else {
+        /* Down Pushed, not in bulb mode, cursor on delay time---------------*/
           optionDelayTime = optionDelayTime - 1;
           if (optionDelayTime < 5) {
             optionDelayTime = 5;
