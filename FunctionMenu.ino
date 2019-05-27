@@ -23,7 +23,7 @@ void action_SM_All()
       /* 'Down' pushed */
       programStateLast = programStateNew;
       programStateNew = programStateNew + 10;
-      if (programStateNew > 40) {
+      if (programStateNew > 50) {
         programStateNew = 10;
       } /* if ProgramStateNew > 40 */
     } /* Down pushed */
@@ -34,7 +34,7 @@ void action_SM_All()
         programStateLast = programStateNew;
         programStateNew = programStateNew - 10;
         if (programStateNew < 10) {
-          programStateNew = 40;
+          programStateNew = 50;
         } /* If programStateNew < 10 */
       } /* If 'Up' pushed */
       else {
@@ -61,6 +61,9 @@ void action_SM_All()
       case program_state_SM_Manual:
         functionPrintSMManual();
         break;
+      case program_state_SM_Options:
+        functionPrintSMOption();
+        break;
       default:
         lcd.print("Error");
         break;
@@ -79,6 +82,11 @@ void action_SM_All()
         break;
       case program_state_SO_Manual:
         functionPrintSOManual();
+        break;
+      case program_state_SO_Option:
+        functionPrintSOOption();
+        lcd.setCursor(13,1);
+        functionPrintTriggerDelay(optionBacklightOffTime);
         break;
       default:
         break;
@@ -100,4 +108,46 @@ void action_SO_Manual()
     programStateNew = program_state_SM_Manual;
   } /* If C pressed */    
 }
+/* ======================================== */
+/* Function for setting Backlight off time  */
+/* ======================================== */
+
+void action_SO_Option()
+{
+  switch (nunchukAction) {
+    case nunchukActionZ:
+      /* Z Pushed so no action ---------------------------------*/
+    break;
+    case nunchukActionC:
+      Serial.println("C Pressed");
+      /* C Pushed ------------------------------------------------------*/
+      programStateLast = programStateNew;
+      programStateNew = program_state_SM_Options;
+      functionPrintSMOption();
+    break;
+    case nunchukActionUp:
+      /* Up Pushed ------------------------------------------------------*/
+      programStateLast = programStateNew;
+      optionBacklightOffTime = optionBacklightOffTime + 1;
+      if (optionBacklightOffTime > 600) {
+        optionBacklightOffTime = 600;
+      } /* If bulbTime <1 */
+      lcdTurnOffTime = optionBacklightOffTime * 1000;
+      lcd.setCursor(13,1);
+      functionPrintTriggerDelay(optionBacklightOffTime);
+      break;
+    case nunchukActionDown:
+      /* Down Pushed ------------------------------------------------------*/
+      programStateLast = programStateNew;
+      optionBacklightOffTime = optionBacklightOffTime - 1;
+      if (optionBacklightOffTime < 10) {
+        optionBacklightOffTime = 10;
+      } /* If bulbTime <1 */
+      lcdTurnOffTime = optionBacklightOffTime * 1000;
+      lcd.setCursor(13,1);
+      functionPrintTriggerDelay(optionBacklightOffTime);
+    break;
+  } /* Case */
+} /* action_SO_Option() */
+
 

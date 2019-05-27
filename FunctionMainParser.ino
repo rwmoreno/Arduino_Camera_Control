@@ -5,6 +5,8 @@
 void FunctionExecuteProgramActions()
 
 {
+  Serial.print("programStateNew: ");
+  Serial.println(programStateNew);
   switch (programStateNew) {
     case program_state_Start:
       action_Start();
@@ -13,6 +15,7 @@ void FunctionExecuteProgramActions()
     case program_state_SM_TimeLapseB:
     case program_state_SM_Trigger:
     case program_state_SM_Manual:
+    case program_state_SM_Options:
       action_SM_All();
       break;
     case program_state_SO_TimeLapse:
@@ -26,6 +29,9 @@ void FunctionExecuteProgramActions()
       break;
     case program_state_SO_Manual:
       action_SO_Manual();
+      break;
+    case program_state_SO_Option:
+      action_SO_Option();
       break;
     case program_state_Run_TimeLapse:
       action_Run_TimeLapse();

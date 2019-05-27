@@ -51,8 +51,22 @@ void functionPrintSMManual()
 }
 
 /* ---------------------------------------------*/
+/* Print to LCD for Set Mode (Options)           */
+/* -------------------------------------------- */
+
+void functionPrintSMOption()
+{
+  lcd.clear();
+  lcd.noCursor();
+  lcd.print("Set Mode");
+  lcd.setCursor(0,1);
+  lcd.print(" Options");
+}
+
+/* ---------------------------------------------*/
 /* Print to LCD for Set Option for Time Lapse   */
 /* -------------------------------------------- */
+
 
 void functionPrintSOTimeLapse()
 {
@@ -153,6 +167,19 @@ void functionPrintSOManual()
 }
 
 /* ---------------------------------------------*/
+/* Print to LCD for Set Option for Options      */
+/* -------------------------------------------- */
+
+void functionPrintSOOption()
+{
+  lcd.clear();
+  lcd.noCursor();
+  lcd.print("Options");
+  lcd.setCursor(0,1);
+  lcd.print("BL time off: ");
+}
+
+/* ---------------------------------------------*/
 /* Print to LCD for Set Option for Manual       */
 /* -------------------------------------------- */
 
@@ -163,6 +190,16 @@ void functionPrintTimeLapseRun()
   lcd.print("Shooting ...");
   lcd.setCursor(0,1);
   lcd.print("Press c to stop");
+}
+
+/* ---------------------------------------------*/
+/* Print to LCD for Set Option for Manual       */
+/* -------------------------------------------- */
+
+void functionPrintTimeLapseTime()
+{
+  lcd.setCursor(12,0);
+  functionPrintSeconds((int) countdownTime);
 }
 
 /* ---------------------------------------------*/
